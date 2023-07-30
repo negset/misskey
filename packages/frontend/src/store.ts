@@ -106,6 +106,14 @@ export const defaultStore = markRaw(new Storage('base', {
 		where: 'account',
 		default: false,
 	},
+	restrictSensitiveNoteVisibility: {
+		where: 'account',
+		default: true,
+	},
+	sensitiveNoteVisibility: {
+		where: 'account',
+		default: 'home',
+	},
 
 	menu: {
 		where: 'deviceAccount',

@@ -57,6 +57,26 @@
 	</FormSection>
 
 	<MkSwitch v-model="keepCw" @update:modelValue="save()">{{ i18n.ts.keepCw }}</MkSwitch>
+
+	<FormSection>
+		<div class="_gaps_m">
+			<MkSwitch v-model="restrictSensitiveNoteVisibility" @update:modelValue="save()">{{ i18n.ts.restrictSensitiveNoteVisibility }}</MkSwitch>
+			<MkFolder v-if="restrictSensitiveNoteVisibility">
+				<template #label>{{ i18n.ts.sensitiveNoteVisibility }}</template>
+				<template v-if="sensitiveNoteVisibility === 'home'" #suffix>{{ i18n.ts._visibility.home }}</template>
+				<template v-else-if="sensitiveNoteVisibility === 'followers'" #suffix>{{ i18n.ts._visibility.followers }}</template>
+				<template v-else-if="sensitiveNoteVisibility === 'specified'" #suffix>{{ i18n.ts._visibility.specified }}</template>
+
+				<div class="_gaps_m">
+					<MkSelect v-model="sensitiveNoteVisibility">
+						<option value="home">{{ i18n.ts._visibility.home }}</option>
+						<option value="followers">{{ i18n.ts._visibility.followers }}</option>
+						<option value="specified">{{ i18n.ts._visibility.specified }}</option>
+					</MkSelect>
+				</div>
+			</MkFolder>
+		</div>
+	</FormSection>
 </div>
 </template>
 
@@ -85,6 +105,8 @@ let defaultNoteVisibility = $computed(defaultStore.makeGetterSetter('defaultNote
 let defaultNoteLocalOnly = $computed(defaultStore.makeGetterSetter('defaultNoteLocalOnly'));
 let rememberNoteVisibility = $computed(defaultStore.makeGetterSetter('rememberNoteVisibility'));
 let keepCw = $computed(defaultStore.makeGetterSetter('keepCw'));
+let restrictSensitiveNoteVisibility = $computed(defaultStore.makeGetterSetter('restrictSensitiveNoteVisibility'));
+let sensitiveNoteVisibility = $computed(defaultStore.makeGetterSetter('sensitiveNoteVisibility'));
 
 function save() {
 	os.api('i/update', {

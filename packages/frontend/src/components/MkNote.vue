@@ -302,7 +302,7 @@ function renote(viaKeyboard = false) {
 	items = items.concat([{
 		text: i18n.ts.renote,
 		icon: 'ti ti-repeat',
-		action: () => {
+		action: async () => {
 			const el = renoteButton.value as HTMLElement | null | undefined;
 			if (el) {
 				const rect = el.getBoundingClientRect();
@@ -311,12 +311,51 @@ function renote(viaKeyboard = false) {
 				os.popup(MkRippleEffect, { x, y }, {}, 'end');
 			}
 
+			let visibility = appearNote.visibility;
 			const configuredVisibility = defaultStore.state.rememberNoteVisibility ? defaultStore.state.visibility : defaultStore.state.defaultNoteVisibility;
+			visibility = smallerVisibility(visibility, configuredVisibility);
+
+			const isSensitive = appearNote.files.some(f => f.isSensitive);
+			const restrictable = visibility !== smallerVisibility(defaultStore.state.sensitiveNoteVisibility, visibility);
+			if (defaultStore.state.restrictSensitiveNoteVisibility && isSensitive && restrictable) {
+				let restricted = '';
+				switch (defaultStore.state.sensitiveNoteVisibility) {
+					case 'home':
+						restricted = i18n.ts._visibility.home;
+						break;
+					case 'followers':
+						restricted = i18n.ts._visibility.followers;
+						break;
+					case 'specified':
+						restricted = i18n.ts._visibility.specified;
+						break;
+				}
+				const { canceled, result } = await os.actions({
+					type: 'warning',
+					text: i18n.ts.thisPostIsSensitive,
+					actions: [{
+						value: 'restrict',
+						text: i18n.t('thisPostIsSensitiveRestrict', { visibility: restricted }),
+						primary: true,
+					}, {
+						value: 'cancel',
+						text: i18n.ts.thisPostIsSensitiveCancel,
+					}, {
+						value: 'ignore',
+						text: i18n.ts.thisPostIsSensitiveIgnore,
+					}],
+				});
+				if (canceled || result === 'cancel') return;
+				if (result === 'restrict') {
+					visibility = defaultStore.state.sensitiveNoteVisibility;
+				}
+			}
+
 			const localOnly = defaultStore.state.rememberNoteVisibility ? defaultStore.state.localOnly : defaultStore.state.defaultNoteLocalOnly;
 
 			os.api('notes/create', {
 				localOnly,
-				visibility: smallerVisibility(appearNote.visibility, configuredVisibility),
+				visibility,
 				renoteId: appearNote.id,
 			}).then(() => {
 				os.toast(i18n.ts.renoted);

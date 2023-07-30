@@ -650,6 +650,17 @@ function deleteDraft() {
 	miLocalStorage.setItem('drafts', JSON.stringify(draftData));
 }
 
+type Visibility = 'public' | 'home' | 'followers' | 'specified';
+
+// defaultStore.state.visibilityがstringなためstringも受け付けている
+function smallerVisibility(a: Visibility | string, b: Visibility | string): Visibility {
+	if (a === 'specified' || b === 'specified') return 'specified';
+	if (a === 'followers' || b === 'followers') return 'followers';
+	if (a === 'home' || b === 'home') return 'home';
+	// if (a === 'public' || b === 'public')
+	return 'public';
+}
+
 async function post(ev?: MouseEvent) {
 	if (ev) {
 		const el = ev.currentTarget ?? ev.target;
@@ -687,6 +698,42 @@ async function post(ev?: MouseEvent) {
 		if (result === 'cancel') return;
 		if (result === 'home') {
 			visibility = 'home';
+		}
+	}
+
+	const isSensitive = files.some(f => f.isSensitive) || props.renote && props.renote.files.some(f => f.isSensitive);
+	const restrictable = visibility !== smallerVisibility(defaultStore.state.sensitiveNoteVisibility, visibility);
+	if (defaultStore.state.restrictSensitiveNoteVisibility && isSensitive && restrictable) {
+		let restricted = '';
+		switch (defaultStore.state.sensitiveNoteVisibility) {
+			case 'home':
+				restricted = i18n.ts._visibility.home;
+				break;
+			case 'followers':
+				restricted = i18n.ts._visibility.followers;
+				break;
+			case 'specified':
+				restricted = i18n.ts._visibility.specified;
+				break;
+		}
+		const { canceled, result } = await os.actions({
+			type: 'warning',
+			text: i18n.ts.thisPostIsSensitive,
+			actions: [{
+				value: 'restrict',
+				text: i18n.t('thisPostIsSensitiveRestrict', { visibility: restricted }),
+				primary: true,
+			}, {
+				value: 'cancel',
+				text: i18n.ts.thisPostIsSensitiveCancel,
+			}, {
+				value: 'ignore',
+				text: i18n.ts.thisPostIsSensitiveIgnore,
+			}],
+		});
+		if (canceled || result === 'cancel') return;
+		if (result === 'restrict') {
+			visibility = defaultStore.state.sensitiveNoteVisibility;
 		}
 	}
 

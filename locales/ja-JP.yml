@@ -1094,6 +1094,12 @@ expired: "期限切れ"
 doYouAgree: "同意しますか？"
 beSureToReadThisAsItIsImportant: "重要ですので必ずお読みください。"
 iHaveReadXCarefullyAndAgree: "「{x}」の内容をよく読み、同意します。"
+restrictSensitiveNoteVisibility: "センシティブな投稿の公開範囲を制限する"
+sensitiveNoteVisibility: "センシティブな投稿の公開範囲"
+thisPostIsSensitive: "この投稿はセンシティブなメディアを含んでいます。"
+thisPostIsSensitiveRestrict: "{visibility}に投稿"
+thisPostIsSensitiveCancel: "やめる"
+thisPostIsSensitiveIgnore: "このまま投稿"
 
 _initialAccountSetting:
   accountCreated: "アカウントの作成が完了しました！"
