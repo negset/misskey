@@ -37,6 +37,9 @@ html
 		//- https://github.com/misskey-dev/misskey/issues/9842
 		link(rel='stylesheet' href='/assets/tabler-icons/tabler-icons.min.css?v2.25.0')
 		link(rel='modulepreload' href=`/vite/${clientEntry.file}`)
+		link(rel='preconnect' href='https://fonts.googleapis.com')
+		link(rel='preconnect' href='https://fonts.gstatic.com' crossorigin)
+		link(rel='stylesheet' href='https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+JP:wght@400;700&display=swap')
 
 		if !config.clientManifestExists
 				script(type="module" src="/vite/@vite/client")
