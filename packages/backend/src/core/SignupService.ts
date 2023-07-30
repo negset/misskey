@@ -2,6 +2,7 @@ import { generateKeyPair } from 'node:crypto';
 import { Inject, Injectable } from '@nestjs/common';
 import bcrypt from 'bcryptjs';
 import { DataSource, IsNull } from 'typeorm';
+import RE2 from 're2';
 import { DI } from '@/di-symbols.js';
 import type { UsedUsernamesRepository, UsersRepository } from '@/models/index.js';
 import type { Config } from '@/config.js';
@@ -84,7 +85,19 @@ export class SignupService {
 
 		if (!opts.ignorePreservedUsernames && !isTheFirstUser) {
 			const instance = await this.metaService.fetch(true);
-			const isPreserved = instance.preservedUsernames.map(x => x.toLowerCase()).includes(username.toLowerCase());
+			const isPreserved = instance.preservedUsernames.some(preserved => {
+				// represents RegExp
+				const regexp = preserved.match(/^\/(.+)\/(.*)$/);
+				if (!regexp) {
+					return preserved.toLowerCase() === username.toLowerCase();
+				}
+				try {
+					return new RE2(regexp[1], regexp[2]).test(username);
+				} catch (err) {
+					// This should never happen due to input sanitisation.
+					return false;
+				}
+			});
 			if (isPreserved) {
 				throw new Error('USED_USERNAME');
 			}

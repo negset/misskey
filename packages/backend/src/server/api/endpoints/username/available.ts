@@ -1,4 +1,5 @@
 import { IsNull } from 'typeorm';
+import RE2 from 're2';
 import { Inject, Injectable } from '@nestjs/common';
 import type { UsedUsernamesRepository, UsersRepository } from '@/models/index.js';
 import { Endpoint } from '@/server/api/endpoint-base.js';
@@ -52,7 +53,19 @@ export default class extends Endpoint<typeof meta, typeof paramDef> {
 			const exist2 = await this.usedUsernamesRepository.countBy({ username: ps.username.toLowerCase() });
 
 			const meta = await this.metaService.fetch();
-			const isPreserved = meta.preservedUsernames.map(x => x.toLowerCase()).includes(ps.username.toLowerCase());
+			const isPreserved = meta.preservedUsernames.some(preserved => {
+				// represents RegExp
+				const regexp = preserved.match(/^\/(.+)\/(.*)$/);
+				if (!regexp) {
+					return preserved.toLowerCase() === ps.username.toLowerCase();
+				}
+				try {
+					return new RE2(regexp[1], regexp[2]).test(ps.username);
+				} catch (err) {
+					// This should never happen due to input sanitisation.
+					return false;
+				}
+			});
 
 			return {
 				available: exist === 0 && exist2 === 0 && !isPreserved,

@@ -1046,7 +1046,7 @@ pleaseConfirmBelowBeforeSignup: "このサーバーに登録するには、以�
 pleaseAgreeAllToContinue: "続けるには、全ての「同意する」にチェックが入っている必要があります。"
 continue: "続ける"
 preservedUsernames: "予約ユーザー名"
-preservedUsernamesDescription: "予約するユーザー名を改行で列挙します。ここで指定されたユーザー名はアカウント作成時に使えなくなりますが、管理者によるアカウント作成時はこの制限を受けません。また、既に存在するアカウントも影響を受けません。"
+preservedUsernamesDescription: "予約するユーザー名を改行で列挙します。ここで指定されたユーザー名はアカウント作成時に使えなくなりますが、管理者によるアカウント作成時はこの制限を受けません。また、既に存在するアカウントも影響を受けません。キーワードをスラッシュで囲むと正規表現になります。"
 createNoteFromTheFile: "このファイルからノートを作成"
 archive: "アーカイブ"
 channelArchiveConfirmTitle: "{name}をアーカイブしますか？"

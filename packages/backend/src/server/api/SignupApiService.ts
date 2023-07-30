@@ -1,6 +1,7 @@
 import { Inject, Injectable } from '@nestjs/common';
 import bcrypt from 'bcryptjs';
 import { IsNull } from 'typeorm';
+import RE2 from 're2';
 import { DI } from '@/di-symbols.js';
 import type { RegistrationTicketsRepository, UsedUsernamesRepository, UserPendingsRepository, UserProfilesRepository, UsersRepository, RegistrationTicket } from '@/models/index.js';
 import type { Config } from '@/config.js';
@@ -147,7 +148,19 @@ export class SignupApiService {
 				throw new FastifyReplyError(400, 'USED_USERNAME');
 			}
 
-			const isPreserved = instance.preservedUsernames.map(x => x.toLowerCase()).includes(username.toLowerCase());
+			const isPreserved = instance.preservedUsernames.some(preserved => {
+				// represents RegExp
+				const regexp = preserved.match(/^\/(.+)\/(.*)$/);
+				if (!regexp) {
+					return preserved.toLowerCase() === username.toLowerCase();
+				}
+				try {
+					return new RE2(regexp[1], regexp[2]).test(username);
+				} catch (err) {
+					// This should never happen due to input sanitisation.
+					return false;
+				}
+			});
 			if (isPreserved) {
 				throw new FastifyReplyError(400, 'DENIED_USERNAME');
 			}
