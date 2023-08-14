@@ -1,7 +1,7 @@
 <template>
 <div v-if="meta" class="rsqzvsbo">
 	<MkFeaturedPhotos class="bg"/>
-	<XTimeline class="tl"/>
+	<!-- <XTimeline class="tl"/> -->
 	<div class="shape1"></div>
 	<div class="shape2"></div>
 	<img src="/client-assets/misskey.svg" class="misskey"/>
@@ -133,7 +133,8 @@ os.apiGet('federation/instances', {
 	> .contents {
 		position: relative;
 		width: min(430px, calc(100% - 32px));
-		margin-left: 128px;
+		/* margin-left: 128px; */
+		margin: auto;
 		padding: 100px 0 100px 0;
 
 		@media (max-width: 1200px) {
